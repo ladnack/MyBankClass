@@ -117,7 +117,7 @@ class Bank {
         
         
         // 残高を求める
-        if banking == Banking.Payment {
+        if banking == Banking.payment {
             self.balance += amount
         } else {
             self.balance -= amount
@@ -129,7 +129,7 @@ class Bank {
         var totalBalance: Int = self.firstBalance
         
         for i in bankStatement {
-            if i.banking == Banking.Payment {
+            if i.banking == Banking.payment {
                 totalBalance += i.amount
             } else {
                 totalBalance -= i.amount
@@ -158,7 +158,7 @@ class Bank {
                 let result2 = calendar.compare(i.date, to: toDate, toUnitGranularity: .day)
                 // i.data < toDateであれば
                 if result2 == .orderedAscending {
-                    if i.banking == Banking.Payment {
+                    if i.banking == Banking.payment {
                         totalBalance += i.amount
                     } else {
                         totalBalance -= i.amount
@@ -218,9 +218,9 @@ class Bank {
 // 銀行取引の種類
 enum Banking {
     // 入金
-    case Payment
+    case payment
     // 出金
-    case Withdrawal
+    case withdrawal
 }
 
 
@@ -275,41 +275,45 @@ let dateFormatter = DateFormatter()
 dateFormatter.dateFormat = "yyyy/MM/dd"
 
 // 取引を追加
-myBank1.addBanking(date: dateFormatter.date(from: "2016/08/04"), banking: .Withdrawal, amount: 24000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/08/10"), banking: .Payment, amount: 30000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/08/20"), banking: .Withdrawal, amount: 15000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/08/25"), banking: .Withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/08/04"), banking: .withdrawal, amount: 24000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/08/10"), banking: .payment, amount: 30000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/08/20"), banking: .withdrawal, amount: 15000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/08/25"), banking: .withdrawal, amount: 10000)
 
-myBank1.addBanking(date: dateFormatter.date(from: "2016/09/04"), banking: .Withdrawal, amount: 27000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/09/10"), banking: .Payment, amount: 30000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/09/23"), banking: .Withdrawal, amount: 5000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/09/30"), banking: .Withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/09/04"), banking: .withdrawal, amount: 27000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/09/10"), banking: .payment, amount: 30000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/09/23"), banking: .withdrawal, amount: 5000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/09/30"), banking: .withdrawal, amount: 10000)
 
-myBank1.addBanking(date: dateFormatter.date(from: "2016/07/06"), banking: .Withdrawal, amount: 10000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/10/06"), banking: .Withdrawal, amount: 20000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/08/15"), banking: .Withdrawal, amount: 10000)
-myBank1.addBanking(date: dateFormatter.date(from: "2016/03/03"), banking: .Withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/07/06"), banking: .withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/10/06"), banking: .withdrawal, amount: 20000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/08/15"), banking: .withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/03/03"), banking: .withdrawal, amount: 10000)
 
-myBank2.addBanking(date: dateFormatter.date(from: "2016/08/04"), banking: .Payment, amount: 80000)  // 外部からの収入
-myBank2.addBanking(date: dateFormatter.date(from: "2016/08/10"), banking: .Withdrawal, amount: 50000)
-myBank2.addBanking(date: dateFormatter.date(from: "2016/08/13"), banking: .Withdrawal, amount: 20000)
-myBank2.addBanking(date: dateFormatter.date(from: "2016/08/17"), banking: .Withdrawal, amount: 10000)
-myBank2.addBanking(date: dateFormatter.date(from: "2016/08/22"), banking: .Withdrawal, amount: 20000)
+for month in 1...12 {
+    myBank2.addBanking(date: dateFormatter.date(from: "2016/\(month)/04"), banking: .payment, amount: 80000)
+}
 
-myBank2.addBanking(date: dateFormatter.date(from: "2016/09/04"), banking: .Payment, amount: 80000)  // 外部からの収入
-myBank2.addBanking(date: dateFormatter.date(from: "2016/09/11"), banking: .Withdrawal, amount: 30000)
-myBank2.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .Withdrawal, amount: 20000)
+//myBank2.addBanking(date: dateFormatter.date(from: "2016/08/04"), banking: .Payment, amount: 80000)  // 外部からの収入
+myBank2.addBanking(date: dateFormatter.date(from: "2016/08/10"), banking: .withdrawal, amount: 50000)
+myBank2.addBanking(date: dateFormatter.date(from: "2016/08/13"), banking: .withdrawal, amount: 20000)
+myBank2.addBanking(date: dateFormatter.date(from: "2016/08/17"), banking: .withdrawal, amount: 10000)
+myBank2.addBanking(date: dateFormatter.date(from: "2016/08/22"), banking: .withdrawal, amount: 20000)
 
-myBank3.addBanking(date: dateFormatter.date(from: "2016/08/05"), banking: .Withdrawal, amount: 10000)
+//myBank2.addBanking(date: dateFormatter.date(from: "2016/09/04"), banking: .Payment, amount: 80000)  // 外部からの収入
+myBank2.addBanking(date: dateFormatter.date(from: "2016/09/11"), banking: .withdrawal, amount: 30000)
+myBank2.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .withdrawal, amount: 20000)
 
-myBank3.addBanking(date: dateFormatter.date(from: "2016/09/09"), banking: .Withdrawal, amount: 13000)
-myBank3.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .Withdrawal, amount: 29000)
+myBank3.addBanking(date: dateFormatter.date(from: "2016/08/05"), banking: .withdrawal, amount: 10000)
+
+myBank3.addBanking(date: dateFormatter.date(from: "2016/09/09"), banking: .withdrawal, amount: 13000)
+myBank3.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .withdrawal, amount: 29000)
 
 
 
 // 残高と取引明細を表示
-print("残高：\(myBank1.balance)")
-myBank1.printBankStatement()
+print("残高：\(myBank2.balance)")
+myBank2.printBankStatement()
 print()
 myBank1.printBankStatement(fromDate: dateFormatter.date(from: "2016/09/02"))
 print()
