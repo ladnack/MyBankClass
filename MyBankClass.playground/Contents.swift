@@ -297,7 +297,7 @@ print("8月の収支：\(superBank.getSumTotalBalance(fromDate: dateFormatter.da
 print("9月の収支：\(superBank.getSumTotalBalance(fromDate: dateFormatter.date(from: "2016/09/01"), toDate: dateFormatter.date(from: "2016/10/01")))")
 
 
-
+// 変更
 
 
 
