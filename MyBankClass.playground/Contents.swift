@@ -37,6 +37,34 @@ print(formatter.string(from: date!)) // 2001/01/02
 //}
 
 
+//var ary = [28, 4, 21, 59, 36, 24, 44]
+//let sortAry = ary.sorted()
+//ary.insert(3, at: 0)
+
+
+//
+//let formatter = DateFormatter()
+//formatter.dateFormat = "yyyy/MM/dd"
+//
+//let testDate = [
+//formatter.date(from: "2016/09/30"),
+//formatter.date(from: "2016/07/30"),
+//formatter.date(from: "2016/02/22"),
+//formatter.date(from: "2016/10/04"),
+//formatter.date(from: "2016/03/03"),]
+//
+//let sortDate = testDate.sorted{
+//    switch ($0, $1) {
+//    case let (.error(aCode), .error(bCode)):
+//        return aCode < bCode
+//        
+//    case (.ok, .ok): return false
+//        
+//    case (.error, .ok): return true
+//    case (.ok, .error): return false
+//    }
+//}
+
 
 // MARK: - Bankクラス
 
@@ -60,24 +88,31 @@ class Bank {
     // 取引を追加し、入出金データに格納
     func addBanking(date: Date!, banking: Banking, amount: Int) {
         let data:(Date, Banking, Int) = (date, banking, amount)
-        self.bankStatement.append(data)
+//        self.bankStatement.append(data)
         
-         // 日付順にデータを並び替えて格納する -> insertがうまく機能せず…
+         // 日付順にデータを並び替えて格納する
         let calendar = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!
-        // 配列が空でなければ
         
-        if bankStatement.isEmpty == false {
+        // 配列が空でなければ
+        if bankStatement.isEmpty {
+            self.bankStatement.append(data)
+            
+        } else {
             let count = bankStatement.count
             var i = 1
             
-            while (calendar.compare(date, to: bankStatement[count - i].date, toUnitGranularity: .day) == .orderedAscending) || count < i {
+            while (calendar.compare(date, to: bankStatement[count - i].date, toUnitGranularity: .day) == .orderedAscending) {
                 
                 i += 1
+                
+                if count < i{
+                    break
+                }
             }
             
+            // Elementにdataを入れるとエラーになる（謎）
             self.bankStatement.insert((date, banking, amount), at: count - i + 1)
-        } else {
-            self.bankStatement.append(data)
+            
         }
         
         
@@ -250,6 +285,11 @@ myBank1.addBanking(date: dateFormatter.date(from: "2016/09/10"), banking: .Payme
 myBank1.addBanking(date: dateFormatter.date(from: "2016/09/23"), banking: .Withdrawal, amount: 5000)
 myBank1.addBanking(date: dateFormatter.date(from: "2016/09/30"), banking: .Withdrawal, amount: 10000)
 
+myBank1.addBanking(date: dateFormatter.date(from: "2016/07/06"), banking: .Withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/10/06"), banking: .Withdrawal, amount: 20000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/08/15"), banking: .Withdrawal, amount: 10000)
+myBank1.addBanking(date: dateFormatter.date(from: "2016/03/03"), banking: .Withdrawal, amount: 10000)
+
 myBank2.addBanking(date: dateFormatter.date(from: "2016/08/04"), banking: .Payment, amount: 80000)  // 外部からの収入
 myBank2.addBanking(date: dateFormatter.date(from: "2016/08/10"), banking: .Withdrawal, amount: 50000)
 myBank2.addBanking(date: dateFormatter.date(from: "2016/08/13"), banking: .Withdrawal, amount: 20000)
@@ -260,10 +300,10 @@ myBank2.addBanking(date: dateFormatter.date(from: "2016/09/04"), banking: .Payme
 myBank2.addBanking(date: dateFormatter.date(from: "2016/09/11"), banking: .Withdrawal, amount: 30000)
 myBank2.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .Withdrawal, amount: 20000)
 
-//myBank3.addBanking(date: dateFormatter.date(from: "2016/08/05"), banking: .Withdrawal, amount: 10000)
+myBank3.addBanking(date: dateFormatter.date(from: "2016/08/05"), banking: .Withdrawal, amount: 10000)
 
-//myBank3.addBanking(date: dateFormatter.date(from: "2016/09/09"), banking: .Withdrawal, amount: 13000)
-//myBank3.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .Withdrawal, amount: 29000)
+myBank3.addBanking(date: dateFormatter.date(from: "2016/09/09"), banking: .Withdrawal, amount: 13000)
+myBank3.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .Withdrawal, amount: 29000)
 
 
 
