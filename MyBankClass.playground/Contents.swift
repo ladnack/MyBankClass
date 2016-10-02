@@ -87,7 +87,7 @@ class Bank {
     
     // 取引を追加し、入出金データに格納
     func addBanking(date: Date!, banking: Banking, amount: Int) {
-        let data:(Date, Banking, Int) = (date, banking, amount)
+        let data: (Date, Banking, Int) = (date, banking, amount)
 //        self.bankStatement.append(data)
         
          // 日付順にデータを並び替えて格納する
@@ -313,6 +313,7 @@ myBank3.addBanking(date: dateFormatter.date(from: "2016/09/21"), banking: .withd
 
 // 残高と取引明細を表示
 print("残高：\(myBank2.balance)")
+// dateをprintした場合、日付がずれる
 myBank2.printBankStatement()
 print()
 myBank1.printBankStatement(fromDate: dateFormatter.date(from: "2016/09/02"))
