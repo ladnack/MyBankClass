@@ -66,36 +66,47 @@ print(formatter.string(from: date!)) // 2001/01/02
 //}
 
 
+//let ary = [1, 2 ,3 ,4 ,5, 6]
+//ary.first
+//
+//var ary2: [Int] = []
+//ary2.first
+//
+//var ary3: [Int] = [1, 2, nil, 4, 5].flatMap{ $0 }
+//ary3
+//let a: [Int] = ary3.flatMap{ $0 }
+//a
+
+
 // MARK: - Bankクラス
 
 class Bank {
     // 銀行名
-    var bankName:String
+    let bankName: String
     // 初期残高を記録
     let firstBalance: Int
     // 残高
     var balance: Int
     // 入出金データ
-    var bankStatement:[(date: Date, banking: Banking, amount: Int)] = []
+    var bankStatement: [BankingData] = []
     
     
     init(name: String, firstBalance: Int) {
-        self.bankName = name
+        bankName = name
         self.firstBalance = firstBalance
-        self.balance = firstBalance
+        balance = self.firstBalance
     }
     
     // 取引を追加し、入出金データに格納
     func addBanking(date: Date!, banking: Banking, amount: Int) {
-        let data: (Date, Banking, Int) = (date, banking, amount)
-//        self.bankStatement.append(data)
+        let data = BankingData(date: date, banking: banking, amount: amount)
         
          // 日付順にデータを並び替えて格納する
         let calendar = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!
         
         // 配列が空でなければ
         if bankStatement.isEmpty {
-            self.bankStatement.append(data)
+            bankStatement.append(data)
             
         } else {
             let count = bankStatement.count
@@ -110,14 +121,13 @@ class Bank {
                 }
             }
             
-            // Elementにdataを入れるとエラーになる（謎）
-            self.bankStatement.insert((date, banking, amount), at: count - i + 1)
+            bankStatement.insert(data, at: count - i + 1)
             
         }
         
         
         // 残高を求める
-        if banking == Banking.payment {
+        if banking == .payment {
             self.balance += amount
         } else {
             self.balance -= amount
@@ -126,13 +136,13 @@ class Bank {
     
     // 過去全ての取引を計算する
     func getTotalBalance() -> Int {
-        var totalBalance: Int = self.firstBalance
+        var totalBalance = firstBalance
         
-        for i in bankStatement {
-            if i.banking == Banking.payment {
-                totalBalance += i.amount
+        bankStatement.forEach { data in
+            if data.banking == .payment {
+                totalBalance += data.amount
             } else {
-                totalBalance -= i.amount
+                totalBalance -= data.amount
             }
         }
         return totalBalance
@@ -140,7 +150,7 @@ class Bank {
     
     // 指定した期間の取引を計算する
     func getTotalBalance(fromDate: Date!, toDate: Date!) -> Int {
-        var totalBalance: Int = 0
+        var totalBalance = 0
         let calendar = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!
         
         // fromData < toDateでなかった場合は強制終了
@@ -149,19 +159,19 @@ class Bank {
             exit(0)
         }
         
-        for i in bankStatement {
+        bankStatement.forEach { data in
             
-            let result1 = calendar.compare(i.date, to: fromDate, toUnitGranularity: .day)
-            // i.date > fromDateであれば
+            let result1 = calendar.compare(data.date, to: fromDate, toUnitGranularity: .day)
+            // data.date > fromDateであれば
             if result1 == .orderedDescending {
                 
-                let result2 = calendar.compare(i.date, to: toDate, toUnitGranularity: .day)
-                // i.data < toDateであれば
+                let result2 = calendar.compare(data.date, to: toDate, toUnitGranularity: .day)
+                // data.date < toDateであれば
                 if result2 == .orderedAscending {
-                    if i.banking == Banking.payment {
-                        totalBalance += i.amount
+                    if data.banking == .payment {
+                        totalBalance += data.amount
                     } else {
-                        totalBalance -= i.amount
+                        totalBalance -= data.amount
                     }
                 }
             }
@@ -173,16 +183,16 @@ class Bank {
     
     // 取引明細を一覧で表示
     func printBankStatement() {
-        for i in bankStatement {
-            print(i)
+        bankStatement.forEach { data in
+            print("\(data.date), \(data.banking), \(data.amount)")
         }
     }
     
     // 指定した日にちの取引のみを表示
     func printBankStatement(fromDate: Date!) {
-        for i in bankStatement {
-            if i.date == fromDate {
-                print(i)
+        bankStatement.forEach { data in
+            if data.date == fromDate {
+                print("\(data.date), \(data.banking), \(data.amount)")
             }
         }
     }
@@ -198,32 +208,65 @@ class Bank {
             return;
         }
         
-        for i in bankStatement {
+        bankStatement.forEach { data in
             
-            let result1 = calendar.compare(i.date, to: fromDate, toUnitGranularity: .day)
+            let result1 = calendar.compare(data.date, to: fromDate, toUnitGranularity: .day)
             // i.date > fromDateであれば
             if result1 == .orderedDescending {
                 
-                let result2 = calendar.compare(i.date, to: toDate, toUnitGranularity: .day)
+                let result2 = calendar.compare(data.date, to: toDate, toUnitGranularity: .day)
                 // i.data < toDateであれば
                 if result2 == .orderedAscending {
-                    print(i)
+                    print("\(data.date), \(data.banking), \(data.amount)")
                 }
             }
         }
+        
     }
     
     // 取引日の最新を得る
-    var newDate: Date {
-        return bankStatement[bankStatement.endIndex - 1].date
+    var newDate: Date! {
+        if bankStatement.isEmpty {
+            return nil
+        } else {
+            return bankStatement.last!.date
+        }
     }
     
     // 取引日の最古を得る
-    var oldDate: Date {
-        return bankStatement[0].date
+    var oldDate: Date! {
+        if bankStatement.isEmpty {
+            return nil
+        } else {
+            return bankStatement.first!.date
+        }
     }
 
 }
+
+
+// 銀行取引の詳細をまとめたデータ
+struct BankingData {
+    let date: Date
+    let banking: Banking
+    let amount: Int
+    // 外部からの入金かどうか
+    var isIncome: Bool = false
+    
+    init(date: Date, banking: Banking, amount: Int) {
+        self.date = date
+        self.banking = banking
+        self.amount = amount
+    }
+    
+    mutating func setIncome() {
+        if banking == .payment {
+            isIncome = true
+        }
+    }
+    
+}
+
 
 // 銀行取引の種類
 enum Banking {
@@ -237,83 +280,110 @@ enum Banking {
 // MARK: - Bankクラスをまとめて扱うクラス
 
 class BankManager {
-    var bank: [Bank]
-    var totalBalance: Int = 0
+    var banks: [Bank]
+    var totalBalance = 0
     
     // 取引期間の最新と最古
-    var mostNewDate: Date!
-    var mostOldDate: Date!
+    var mostNewDate: Date {
+        let period = datePeriod()
+        return period.last!
+    }
+    
+    var mostOldDate: Date {
+        let period = datePeriod()
+        return period.first!
+    }
     
     
-    init(bank: [Bank]) {
-        self.bank = bank
-        self.totalBalance = getSumTotalBalance()
-        datePeriod()
+    init(banks: [Bank]) {
+        self.banks = banks
+        totalBalance = getSumTotalBalance()
     }
     
     // 銀行を追加
     func addBank(bank: Bank) {
-        self.bank.append(bank)
-        self.totalBalance = self.getSumTotalBalance()
-        datePeriod()
+        banks.append(bank)
+        totalBalance = getSumTotalBalance()
     }
     
     // 合計残高を算出
     func getSumTotalBalance() -> Int {
         var total = 0
-        
-        for i in self.bank {
-            total += i.getTotalBalance()
-        }
+        banks.forEach { total += $0.getTotalBalance() }
         return total
     }
     
     // 指定期間の収支バランスを求める
     func getSumTotalBalance(fromDate: Date!, toDate: Date!) -> Int {
         var total = 0
-        
-        for i in self.bank {
-            total += i.getTotalBalance(fromDate: fromDate, toDate: toDate)
-        }
+        banks.forEach { total += $0.getTotalBalance(fromDate: fromDate, toDate: toDate) }
         return total
     }
     
-    // 全ての取引期間の最新と最古を求める
-    private func datePeriod() {
-        let calendar = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!
-        var datePeriod: [Date] = []
+    // 全ての取引期間の最新値と最古値の候補を返す
+    private func datePeriod() -> [Date] {
         
-        for bank in self.bank {
-            let period: [Date] = [bank.oldDate, bank.newDate]
-            
-            for data in period {
-                // 配列が空でなければ
-                if datePeriod.isEmpty {
-                    datePeriod.append(data)
-                    
-                } else {
-                    let count = datePeriod.count
-                    var i = 1
-                    
-                    while (calendar.compare(data, to: datePeriod[count - i], toUnitGranularity: .day) == .orderedAscending) {
-                        
-                        i += 1
-                        
-                        if count < i{
-                            break
-                        }
-                    }
-                    
-                    // Elementにdataを入れるとエラーになる（謎）
-                    datePeriod.insert(data, at: count - i + 1)
-                    
-                }
-            }
+        var period: [Date?] = []
+        
+        for bank in banks {
+            period.append(bank.oldDate)
+            period.append(bank.newDate)
         }
         
-        self.mostNewDate = datePeriod[datePeriod.endIndex - 1]
-        self.mostOldDate = datePeriod[0]
+        // nilを除いたDate配列を作る
+        let datePeriod: [Date] = period.flatMap { $0 }
         
+        // 日付順に並び替える
+        let sortPeriod = datePeriod.sorted(by: { (date1: Date, date2: Date) -> Bool in
+            let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+            return calendar.compare(date1, to: date2, toGranularity: .day) == .orderedAscending
+        })
+        
+        
+//        datePeriod.forEach { date in
+//            
+//            let count = datePeriod.count
+//            var i = 1
+//            
+//            let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+//            
+//            while (calendar.compare(date, to: datePeriod[count - i], toGranularity: .day) == .orderedAscending) {
+//                
+//                i += 1
+//                
+//                if count < i{
+//                    break
+//                }
+//            }
+//            
+//            datePeriod.insert(date, at: count - i + 1)
+//            
+//        }
+        
+//        for date in period {
+//            // 配列が空でなければ
+//            if datePeriod.isEmpty {
+//                datePeriod.append(date)
+//                
+//            } else {
+//                let count = datePeriod.count
+//                var i = 1
+//                
+//                while (calendar.compare(date!, to: datePeriod[count - i], toGranularity: .day) == .orderedAscending) {
+//                    
+//                    i += 1
+//                    
+//                    if count < i{
+//                        break
+//                    }
+//                }
+//                
+//                datePeriod.insert(date, at: count - i + 1)
+//            }
+//        }
+        
+        
+        return sortPeriod
     }
     
 }
@@ -383,7 +453,7 @@ print("残高：\(myBank3.balance)")
 
 
 // 全ての銀行を管理
-let superBank = BankManager(bank: [myBank1, myBank2, myBank3])
+let superBank = BankManager(banks: [myBank1, myBank2, myBank3])
 print("合計残高：\(superBank.totalBalance)")
 
 print()
@@ -396,11 +466,36 @@ print("8月の収支：\(superBank.getSumTotalBalance(fromDate: dateFormatter.da
 print("9月の収支：\(superBank.getSumTotalBalance(fromDate: dateFormatter.date(from: "2016/09/01"), toDate: dateFormatter.date(from: "2016/10/01")))")
 
 
+
 // 機能追加
 myBank2.oldDate
 myBank2.newDate
 
-superBank.mostNewDate
+//superBank.mostOldDate
+//superBank.mostNewDate
+
+
+let myBank4 = Bank(name: "西内銀行", firstBalance: 30000)
+superBank.addBank(bank: myBank4)
+
+myBank4.bankStatement
+myBank4.bankStatement.first
+myBank4.bankStatement.last
+
+myBank4.oldDate
+
 superBank.mostOldDate
+superBank.mostNewDate
+
+
+
+
+
+
+
+
+
+
+
 
 
