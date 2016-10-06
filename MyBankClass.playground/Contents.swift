@@ -101,7 +101,7 @@ class Bank {
     func addBanking(date: Date!, banking: Banking, amount: Int) {
         let data = BankingData(date: date, banking: banking, amount: amount)
         
-         // 日付順にデータを並び替えて格納する
+        // 日付順にデータを並び替えて格納する
         let calendar = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!
         
         // 配列が空でなければ
@@ -128,9 +128,9 @@ class Bank {
         
         // 残高を求める
         if banking == .payment {
-            self.balance += amount
+            balance += amount
         } else {
-            self.balance -= amount
+            balance -= amount
         }
     }
     
@@ -241,6 +241,38 @@ class Bank {
             return bankStatement.first!.date
         }
     }
+    
+    // 指定した期間内での外部からの収入を得る
+    func getIncome(fromDate: Date!, toDate: Date!) -> Int {
+        
+        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+        
+        var income = 0
+        
+        // fromData < toDateでなかった場合は強制終了
+        if calendar.compare(fromDate, to: toDate, toGranularity: .day) != .orderedAscending {
+            print("期間設定に誤りがあります。")
+            return income
+        }
+        
+        bankStatement.forEach { data in
+            
+            let result1 = calendar.compare(data.date, to: fromDate, toGranularity: .day)
+            // data.date > fromDateであれば
+            if result1 == .orderedDescending {
+                
+                let result2 = calendar.compare(data.date, to: toDate, toGranularity: .day)
+                // data.data < toDateであれば
+                if result2 == .orderedAscending {
+                    if data.isIncome {
+                        income += data.amount
+                    }
+                }
+            }
+        }
+        
+        return income
+    }
 
 }
 
@@ -339,51 +371,14 @@ class BankManager {
             return calendar.compare(date1, to: date2, toGranularity: .day) == .orderedAscending
         })
         
-        
-//        datePeriod.forEach { date in
-//            
-//            let count = datePeriod.count
-//            var i = 1
-//            
-//            let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
-//            
-//            while (calendar.compare(date, to: datePeriod[count - i], toGranularity: .day) == .orderedAscending) {
-//                
-//                i += 1
-//                
-//                if count < i{
-//                    break
-//                }
-//            }
-//            
-//            datePeriod.insert(date, at: count - i + 1)
-//            
-//        }
-        
-//        for date in period {
-//            // 配列が空でなければ
-//            if datePeriod.isEmpty {
-//                datePeriod.append(date)
-//                
-//            } else {
-//                let count = datePeriod.count
-//                var i = 1
-//                
-//                while (calendar.compare(date!, to: datePeriod[count - i], toGranularity: .day) == .orderedAscending) {
-//                    
-//                    i += 1
-//                    
-//                    if count < i{
-//                        break
-//                    }
-//                }
-//                
-//                datePeriod.insert(date, at: count - i + 1)
-//            }
-//        }
-        
-        
         return sortPeriod
+    }
+    
+    // 指定した期間内での外部からの収入を得る
+    func getTotalIncome(fromDate: Date!, toDate: Date!) -> Int {
+        var income = 0
+        banks.forEach { income += $0.getIncome(fromDate: fromDate, toDate: toDate) }
+        return income
     }
     
 }
@@ -471,10 +466,6 @@ print("9月の収支：\(superBank.getSumTotalBalance(fromDate: dateFormatter.da
 myBank2.oldDate
 myBank2.newDate
 
-//superBank.mostOldDate
-//superBank.mostNewDate
-
-
 let myBank4 = Bank(name: "西内銀行", firstBalance: 30000)
 superBank.addBank(bank: myBank4)
 
@@ -488,8 +479,12 @@ superBank.mostOldDate
 superBank.mostNewDate
 
 
+// 外部からの入金を設定
+myBank2.bankStatement[5].setIncome()
+// 指定期間の収入を得る
+myBank2.getIncome(fromDate: dateFormatter.date(from: "2016/06/01"), toDate: dateFormatter.date(from: "2016/07/01"))
 
-
+superBank.getTotalIncome(fromDate: dateFormatter.date(from: "2016/07/01"), toDate: dateFormatter.date(from: "2016/08/01"))
 
 
 
