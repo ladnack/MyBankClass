@@ -157,7 +157,7 @@ class Bank {
             return 0
         }
         
-        var totalBalance = 0
+//        var totalBalance = 0
         let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
         
         // fromData < toDateでなかった場合は強制終了
@@ -166,24 +166,31 @@ class Bank {
             exit(0)
         }
         
-        bankStatement.forEach { data in
-            
-            let result1 = calendar.compare(data.date, to: fromDate, toGranularity: .day)
-            // data.date > fromDateであれば
-            if result1 == .orderedDescending {
-                
-                let result2 = calendar.compare(data.date, to: toDate, toGranularity: .day)
-                // data.date < toDateであれば
-                if result2 == .orderedAscending {
-                    if case .payment = data.banking {
-                        totalBalance += data.amount
-                    } else {
-                        totalBalance -= data.amount
-                    }
+        return bankStatement.filter { data in
+             calendar.compare(fromDate, to: data.date, toGranularity: .day) == .orderedAscending && calendar.compare(data.date, to: toDate, toGranularity: .day) == .orderedAscending
+            }.reduce(0) { totalBalance, data in
+                switch data.banking {
+                case .payment:      return totalBalance + data.amount
+                case .withdrawal:   return totalBalance - data.amount
                 }
-            }
         }
-        return totalBalance
+        
+//        bankStatement.forEach { data in
+//            // fromDate < data.dateであれば
+//            if case .orderedAscending = calendar.compare(fromDate, to: data.date, toGranularity: .day) {
+//                // data.date < toDateであれば
+//                if case .orderedAscending = calendar.compare(data.date, to: toDate, toGranularity: .day) {
+//                    if case .payment = data.banking {
+//                        totalBalance += data.amount
+//                    } else {
+//                        totalBalance -= data.amount
+//                    }
+//                }
+//            }
+//        }
+//
+//        return totalBalance
+        
     }
     
     
@@ -500,28 +507,28 @@ print("9月の収支：\(superBank.getSumTotalBalance(fromDate: dateFormatter.da
 
 
 // 機能追加
-myBank2.oldDate
-myBank2.newDate
-
-let myBank4 = Bank(name: "西内銀行", firstBalance: 30000)
-superBank.addBank(bank: myBank4)
-
-myBank4.bankStatement
-myBank4.bankStatement.first
-myBank4.bankStatement.last
-
-myBank4.oldDate
-
-superBank.mostOldDate
-superBank.mostNewDate
-
-
-// 外部からの入金を設定
-myBank2.bankStatement[5].setIncome()
-// 指定期間の収入を得る
-myBank2.getIncome(fromDate: dateFormatter.date(from: "2016/06/01"), toDate: dateFormatter.date(from: "2016/07/01"))
-
-superBank.getTotalIncome(fromDate: dateFormatter.date(from: "2016/07/01"), toDate: dateFormatter.date(from: "2016/08/01"))
+//myBank2.oldDate
+//myBank2.newDate
+//
+//let myBank4 = Bank(name: "西内銀行", firstBalance: 30000)
+//superBank.addBank(bank: myBank4)
+//
+//myBank4.bankStatement
+//myBank4.bankStatement.first
+//myBank4.bankStatement.last
+//
+//myBank4.oldDate
+//
+//superBank.mostOldDate
+//superBank.mostNewDate
+//
+//
+//// 外部からの入金を設定
+//myBank2.bankStatement[5].setIncome()
+//// 指定期間の収入を得る
+//myBank2.getIncome(fromDate: dateFormatter.date(from: "2016/06/01"), toDate: dateFormatter.date(from: "2016/07/01"))
+//
+//superBank.getTotalIncome(fromDate: dateFormatter.date(from: "2016/07/01"), toDate: dateFormatter.date(from: "2016/08/01"))
 
 
 
