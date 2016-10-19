@@ -97,6 +97,8 @@ class Bank {
         balance = self.firstBalance
     }
     
+    var calendar: Calendar { return Calendar(identifier: Calendar.Identifier.gregorian) }
+    
     // 取引を追加し、入出金データに格納
     func addBanking(date: Date?, banking: BankingData.Banking, amount: Int?) {
         guard let date = date, let amount = amount else {
@@ -106,8 +108,6 @@ class Bank {
         let data = BankingData(date: date, banking: banking, amount: amount)
         
         // 日付順にデータを並び替えて格納する
-        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
-        
         // 配列が空でなければ
         if bankStatement.isEmpty {
             bankStatement.append(data)
@@ -158,7 +158,6 @@ class Bank {
         }
         
 //        var totalBalance = 0
-        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
         
         // fromData < toDateでなかった場合は強制終了
         if calendar.compare(fromDate, to: toDate, toGranularity: .day) != .orderedAscending {
@@ -221,8 +220,6 @@ class Bank {
             return
         }
         
-        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
-        
         // fromData < toDateでなかった場合は強制終了
         if calendar.compare(fromDate, to: toDate, toGranularity: .day) != .orderedAscending {
             print("期間設定に誤りがあります。")
@@ -268,8 +265,6 @@ class Bank {
         guard let fromDate = fromDate, let toDate = toDate else {
             return 0
         }
-        
-        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
         
         var income = 0
         
@@ -349,6 +344,8 @@ class BankManager {
         return period.first
     }
     
+    var calendar: Calendar { return Calendar(identifier: Calendar.Identifier.gregorian) }
+    
     
     init(banks: [Bank]) {
         self.banks = banks
@@ -403,7 +400,6 @@ class BankManager {
         
         // 日付順に並び替える
         let sortPeriod = datePeriod.sorted(by: { (date1: Date, date2: Date) -> Bool in
-            let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
             return calendar.compare(date1, to: date2, toGranularity: .day) == .orderedAscending
         })
         
