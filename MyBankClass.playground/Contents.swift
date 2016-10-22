@@ -97,8 +97,6 @@ class Bank {
         balance = self.firstBalance
     }
     
-    var calendar: Calendar { return Calendar(identifier: Calendar.Identifier.gregorian) }
-    
     // 取引を追加し、入出金データに格納
     func addBanking(date: Date?, banking: BankingData.Banking, amount: Int?) {
         guard let date = date, let amount = amount else {
@@ -116,7 +114,7 @@ class Bank {
             let count = bankStatement.count
             var loop = 1
             
-            while (calendar.compare(date, to: bankStatement[count - loop].date, toGranularity: .day) == .orderedAscending) {
+            while date < bankStatement[count - loop].date {
                 
                 loop += 1
                 
@@ -153,15 +151,13 @@ class Bank {
             return nil
         }
         
-        // fromDate < toDateでなければnilを返す
-        guard calendar.compare(fromDate, to: toDate, toGranularity: .day) == .orderedAscending else {
+        guard fromDate < toDate else {
             print("期間設定に誤りがあります。")
             return nil
         }
         
         return bankStatement.filter { data in
-            // fromDate < data.date < toDate
-            calendar.compare(fromDate, to: data.date, toGranularity: .day) == .orderedAscending && calendar.compare(data.date, to: toDate, toGranularity: .day) == .orderedAscending
+            fromDate < data.date && data.date < toDate
             }.reduce(0) { totalBalance, data in
                 switch data.banking {
                 case .payment:      return totalBalance! + data.amount
@@ -198,14 +194,14 @@ class Bank {
         }
         
         // fromData < toDateでなかった場合は強制終了
-        guard calendar.compare(fromDate, to: toDate, toGranularity: .day) == .orderedAscending else {
+        guard fromDate < toDate else {
             print("期間設定に誤りがあります。")
             return
         }
         
         bankStatement.filter { data in
             // fromDate < data.date < toDate
-            calendar.compare(fromDate, to: data.date, toGranularity: .day) == .orderedAscending && calendar.compare(data.date, to: toDate, toGranularity: .day) == .orderedAscending
+            fromDate < data.date && data.date < toDate
             }.forEach { data in
                 print("\(data.date), \(data.banking), \(data.amount)")
         }
@@ -236,15 +232,14 @@ class Bank {
             return nil
         }
         
-        // fromData < toDateでなかった場合は強制終了
-        guard calendar.compare(fromDate, to: toDate, toGranularity: .day) == .orderedAscending else {
+        // fromDate < toDateでなかった場合は強制終了
+        guard fromDate < toDate else {
             print("期間設定に誤りがあります。")
             return nil
         }
         
         return bankStatement.filter { data in
-            // fromDate < data.date < toDate
-            calendar.compare(fromDate, to: data.date, toGranularity: .day) == .orderedAscending && calendar.compare(data.date, to: toDate, toGranularity: .day) == .orderedAscending
+            fromDate < data.date && data.date < toDate
             }.reduce(0) { income, data in
                 guard let income = income else { return nil }
                 
@@ -254,26 +249,7 @@ class Bank {
                     return income
                 }
         }
-        
-//        bankStatement.forEach { data in
-//            
-//            let result1 = calendar.compare(data.date, to: fromDate, toGranularity: .day)
-//            // data.date > fromDateであれば
-//            if result1 == .orderedDescending {
-//                
-//                let result2 = calendar.compare(data.date, to: toDate, toGranularity: .day)
-//                // data.data < toDateであれば
-//                if result2 == .orderedAscending {
-//                    if data.isIncome {
-//                        income += data.amount
-//                    }
-//                }
-//            }
-//        }
-//        
-//        return income
     }
-
 }
 
 
@@ -321,8 +297,6 @@ class BankManager {
         return datePeriod.first
     }
     
-    var calendar: Calendar { return Calendar(identifier: Calendar.Identifier.gregorian) }
-    
     
     init(banks: [Bank]) {
         self.banks = banks
@@ -367,7 +341,7 @@ class BankManager {
         
         // 日付順に並び替える
         let sortPeriod = datePeriod.sorted(by: { (date1: Date, date2: Date) -> Bool in
-            return calendar.compare(date1, to: date2, toGranularity: .day) == .orderedAscending
+            return date1 < date2
         })
         
         return sortPeriod
