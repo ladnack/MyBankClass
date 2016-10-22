@@ -200,7 +200,6 @@ class Bank {
         }
         
         bankStatement.filter { data in
-            // fromDate < data.date < toDate
             fromDate < data.date && data.date < toDate
             }.forEach { data in
                 print("\(data.date), \(data.banking), \(data.amount)")
